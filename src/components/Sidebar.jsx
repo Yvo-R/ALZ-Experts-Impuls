@@ -5,7 +5,7 @@ export default function Sidebar({ frames, onUpdate, onUpdateTitle, onAdd, onDele
     const [isOpen, setIsOpen] = useState(false)
 
     // Only show sidebar on the first slide (index 0)
-    if (activeIndex !== 0) return null
+    // if (activeIndex !== 0) return null
 
     return (
         <div style={{
