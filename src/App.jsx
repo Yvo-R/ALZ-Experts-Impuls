@@ -194,6 +194,40 @@ function App() {
         }
     }
 
+    const handleReorder = async (newOrder) => {
+        // We want to keep the 3D positions/rotations fixed in space, 
+        // but change which slide occupies which slot.
+        // So we take the positions/rotations from the OLD order and apply them to the NEW order.
+
+        const reorderedFrames = newOrder.map((frame, i) => {
+            const targetPosition = frames[i].position
+            const targetRotation = frames[i].rotation
+            return {
+                ...frame,
+                position: targetPosition,
+                rotation: targetRotation
+            }
+        })
+
+        setFrames(reorderedFrames)
+
+        // Persist the new order and swapped positions
+        try {
+            // We need to save ALL frames because their positions/rotations might have changed
+            // relative to their ID (effectively swapping places).
+            // Also need to preserve Blobs as usual.
+            const dbFrames = await getAllFramesData()
+            const framesToSave = reorderedFrames.map(stateFrame => {
+                const dbFrame = dbFrames.find(dbf => dbf.id === stateFrame.id)
+                const url = dbFrame ? dbFrame.url : stateFrame.url
+                return { ...stateFrame, url }
+            })
+            await Promise.all(framesToSave.map(f => saveFrameData(f)))
+        } catch (error) {
+            console.error("Failed to save reordered frames:", error)
+        }
+    }
+
     return (
         <ErrorBoundary>
             <div style={{ width: '100vw', height: '100vh', background: '#000', position: 'relative' }}>
@@ -204,6 +238,7 @@ function App() {
                     onAdd={handleAddFrame}
                     onDelete={handleDeleteFrame}
                     onInsert={handleInsertFrame}
+                    onReorder={handleReorder}
                     onSelect={setIndex}
                     activeIndex={index}
                 />
