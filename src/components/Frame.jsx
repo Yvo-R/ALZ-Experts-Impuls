@@ -3,6 +3,12 @@ import { useFrame } from '@react-three/fiber'
 import { Text, Image, useCursor, Html, useVideoTexture } from '@react-three/drei'
 import { motion } from 'framer-motion-3d'
 
+function getYouTubeId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    return (match && match[2].length === 11) ? match[2] : null
+}
+
 function VideoPlane({ url }) {
     const texture = useVideoTexture(url)
     return (
@@ -13,19 +19,10 @@ function VideoPlane({ url }) {
     )
 }
 
-export default function Frame({ id, position, rotation, url, type = 'image', title, isActive, onClick, onUpdate, ...props }) {
+export default function Frame({ id, position, rotation, url, type = 'image', title, isActive, onClick, ...props }) {
     const ref = useRef()
     const [hovered, setHover] = useState(false)
     useCursor(hovered)
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0]
-        if (file) {
-            const newUrl = URL.createObjectURL(file)
-            const newType = file.type.startsWith('video') ? 'video' : 'image'
-            onUpdate(newUrl, newType)
-        }
-    }
 
     return (
         <group {...props}>
@@ -53,6 +50,20 @@ export default function Frame({ id, position, rotation, url, type = 'image', tit
                         <group position={[0, 0, 0.01]}>
                             <VideoPlane url={url} />
                         </group>
+                    ) : type === 'youtube' ? (
+                        <Html transform position={[0, 0, 0.02]} scale={0.1} occlude="blending" zIndexRange={[100, 0]}>
+                            <div style={{ width: '1600px', height: '900px', background: 'black' }}>
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src={`https://www.youtube.com/embed/${getYouTubeId(url)}?autoplay=1&mute=1&enablejsapi=1`}
+                                    title="YouTube video player"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                        </Html>
                     ) : (
                         <Image url={url} scale={[4, 2.25]} transparent opacity={0.9} position={[0, 0, 0.01]} />
                     )}
@@ -60,41 +71,14 @@ export default function Frame({ id, position, rotation, url, type = 'image', tit
 
                 {/* Title */}
                 <Text
-                    position={[0, 1.4, 0.06]}
-                    fontSize={0.2}
+                    position={[0, 1.4, 0.2]}
+                    fontSize={0.25}
                     color="white"
                     anchorX="center"
                     anchorY="middle"
                 >
                     {title}
                 </Text>
-
-                {/* Edit UI */}
-                {isActive && (
-                    <Html position={[1.9, -1.0, 0.2]} transform center scale={0.2}>
-                        <div style={{
-                            background: 'rgba(0, 170, 255, 0.4)',
-                            backdropFilter: 'blur(8px)',
-                            padding: '12px 24px',
-                            borderRadius: '30px',
-                            cursor: 'pointer',
-                            border: '2px solid rgba(255, 255, 255, 0.8)',
-                            transition: 'all 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 0 15px rgba(0, 170, 255, 0.5)'
-                        }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 170, 255, 0.8)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0, 170, 255, 0.4)'}
-                        >
-                            <label style={{ cursor: 'pointer', color: 'white', fontSize: '40px', fontFamily: 'sans-serif', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap' }}>
-                                <span>✎</span> Edit
-                                <input type="file" accept="image/*,video/*" onChange={handleFileChange} style={{ display: 'none' }} />
-                            </label>
-                        </div>
-                    </Html>
-                )}
             </motion.group>
         </group>
     )
