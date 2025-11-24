@@ -12,6 +12,12 @@ A dynamic, immersive 3D presentation application built with React and Three.js. 
     -   **Delete**: Quickly remove slides (with protection for the first slide).
     -   **Edit**: Update slide titles, upload images/videos, or embed YouTube links.
 -   **Data Persistence**: All changes (slides, content, order) are saved locally using **IndexedDB**, ensuring your presentation is preserved across reloads.
+-   **Background Customization**:
+    -   **Floating Logos**: Two customizable background logos float and rotate in the distance.
+    -   **Logo Controls**: Upload custom logos and adjust their distance via the sidebar.
+-   **Dynamic Path Generation**:
+    -   **Randomized Placement**: New slides are placed with dynamic offsets, creating a winding path through space.
+    -   **3D Rotation**: Slides are randomly rotated (10-30 degrees) to enhance the 3D depth and immersion.
 -   **Keyboard Navigation**: Navigate using Arrow keys, Spacebar, or Home key.
 
 ## Tech Stack

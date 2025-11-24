@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
 
-export default function Sidebar({ frames, onUpdate, onUpdateTitle, onAdd, onDelete, onInsert, onReorder, onSelect, activeIndex }) {
+export default function Sidebar({ frames, logos, logoDistance, onUpdate, onUpdateTitle, onUpdateLogo, onUpdateLogoDistance, onAdd, onDelete, onInsert, onReorder, onSelect, activeIndex }) {
     const [isOpen, setIsOpen] = useState(false)
 
     // Only show sidebar on the first slide (index 0)
@@ -33,6 +33,66 @@ export default function Sidebar({ frames, onUpdate, onUpdateTitle, onAdd, onDele
             }}>
                 <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                     <h2 style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>Presentation</h2>
+                </div>
+
+                {/* Background Logos Section */}
+                <div style={{ padding: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                    <h3 style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 10px 0', fontSize: '0.9rem' }}>Background Logos</h3>
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                        {logos && logos.map((logo, i) => (
+                            <div key={logo.id} style={{ flex: 1 }}>
+                                <div style={{
+                                    height: '60px',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    borderRadius: '4px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: '5px',
+                                    overflow: 'hidden'
+                                }}>
+                                    <img src={logo.url} alt={`Logo ${i + 1}`} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                </div>
+                                <label style={{
+                                    display: 'block',
+                                    background: '#333',
+                                    color: 'white',
+                                    padding: '4px',
+                                    borderRadius: '4px',
+                                    fontSize: '0.7rem',
+                                    textAlign: 'center',
+                                    cursor: 'pointer'
+                                }}>
+                                    Change
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                        onChange={(e) => {
+                                            if (e.target.files[0]) {
+                                                onUpdateLogo(i, e.target.files[0])
+                                            }
+                                        }}
+                                    />
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Distance Slider */}
+                    <div>
+                        <label style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', display: 'block', marginBottom: '5px' }}>
+                            Distance: {logoDistance}
+                        </label>
+                        <input
+                            type="range"
+                            min="20"
+                            max="150"
+                            value={logoDistance}
+                            onChange={(e) => onUpdateLogoDistance(Number(e.target.value))}
+                            style={{ width: '100%' }}
+                        />
+                    </div>
                 </div>
 
                 <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>

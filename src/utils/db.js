@@ -41,3 +41,25 @@ export const deleteFrameData = async (id) => {
         tx.onerror = () => reject(tx.error);
     });
 };
+
+export const saveSettings = async (key, value) => {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        // We store settings in the same 'frames' store but with a special ID
+        // Value is an object, we spread it and ensure ID is set
+        tx.objectStore(STORE_NAME).put({ id: key, ...value });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+};
+
+export const getSettings = async (key) => {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const request = tx.objectStore(STORE_NAME).get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+};
